@@ -1,0 +1,25 @@
+{
+  "name": "bayes-stream",
+  "version": "0.0.1",
+  "description": "Calculates the conditional probabilities from a stream of events",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [
+    "bayesian",
+    "conditional",
+    "probability",
+    "streaming",
+    "calculator",
+    "bayes"
+  ],
+  "author": "Seth Lakowske",
+  "license": "BSD-3",
+  "devDependencies": {
+    "tape": "^3.5.0"
+  },
+  "dependencies": {
+    "through": "^2.3.6"
+  }
+}
