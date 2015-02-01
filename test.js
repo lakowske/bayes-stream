@@ -3,6 +3,7 @@
  */
 
 var test       = require('tape');
+var through    = require('through');
 var bayesCalc  = require('./');
 
 
@@ -12,6 +13,18 @@ test('keeps track of counts', function(t) {
         outcome     : {cancer : 'true'},
         conditional : {diagnosis : "true"}
     });
+
+    output = [];
+
+    var capture = through(function(data) {
+        output.push(data);
+        this.queue(data);
+    }, function(end) {
+        console.log(output);
+        this.queue(null);
+    })
+
+    bayes.pipe(capture);
 
     bayes.write({cancer : 'true', diagnosis : 'true'})
     bayes.write({cancer : 'true', diagnosis : 'true'})
@@ -25,6 +38,8 @@ test('keeps track of counts', function(t) {
     bayes.write({cancer : 'false', diagnosis : 'false'})
 
     bayes.write({cancer : 'false', diagnosis : 'true'})
+
+    bayes.end();
 
     //t.equal(bayesCalculator.events(), 8, 'should be 8 events');
 
