@@ -6,8 +6,7 @@ var test       = require('tape');
 var through    = require('through');
 var bayesCalc  = require('./');
 
-
-test('keeps track of counts', function(t) {
+test('predicts cancer likelihood', function(t) {
 
     var bayes = bayesCalc({
         outcome     : {cancer : 'true'},
@@ -20,7 +19,7 @@ test('keeps track of counts', function(t) {
         output.push(data);
         this.queue(data);
     }, function(end) {
-        console.log(output);
+        t.equal(output[output.length-1].conditionalProbability, 0.75, '3/4 probability')
         this.queue(null);
     })
 
@@ -41,11 +40,5 @@ test('keeps track of counts', function(t) {
 
     bayes.end();
 
-    //t.equal(bayesCalculator.events(), 8, 'should be 8 events');
-
-    //t.equal(bayesCalculator.probability({cancer:'true'}), 0.5, 'should be 0.5');
-
-
     t.end();
 })
-

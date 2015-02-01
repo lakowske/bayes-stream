@@ -9,20 +9,15 @@ var through = require('through');
  * Return the probability of event occurring given some evidence (i.e. condition).
  *
  * @param {Object} condition to stream probability for.
- * @param {Object} event defined by properties
- * (e.g. {cancer : "true", diagnosis : "true"} or
- *       { url   : "/articles/github-push-event-deployment", system : "Linux" }
- * @return {Object} the probabilty of the event.
- */
-
-/*
- * Return the conditional P( { url : "/news" } | {system : "Linux", referal : "/about" } )
+ * e.g. { outcome : {cancer : 'true'}, conditional : {diagnosis : "true"} }
+ * @param {Object} event with properties describing the event
+ * e.g. {cancer : "true", diagnosis : "true"} or
+ *      { url   : "/articles/github-push-event-deployment", system : "Linux" }
+ * @return {Object} Return the conditional probablity of events.
+ * e.g. P( { url : '/news' } | {system : 'linux', referal : '/about' } ) = 0.1   or
+ *      P( { url : '/news' } | {system : 'linux'} )                      = 0.75
  */
 function buildBayesStream(condition) {
-
-    // p ( '/about' | 'linux' ) = { url : '/about', system : 'Linux', conditional : 'system', outcome : 'url' }
-    conditionals = {}
-    console.log(condition);
     var outcomes = condition.outcome;
     var conditional = condition.conditional;
     var matched = 0;
@@ -32,82 +27,45 @@ function buildBayesStream(condition) {
     var stream = through(function write(event) {
 
         var result = {}
-        for (var outcome in outcomes) {
-            console.log('outcome: ' + outcome);
-            var targetValue = outcomes[outcome];
-            var actualValue = event[outcome];
-            console.log('targetValue: ' + targetValue);
-            console.log('actualValue: ' + actualValue);
-            var matchOutcome = targetValue === actualValue;
+        total += 1;
 
-            if (event[outcome]) {
-                result[outcome] = event[outcome];
+        //check the event outcome matches the target outcome
+        for (var outcomeName in outcomes) {
+            if (outcomes.hasOwnProperty(outcomeName)) {
+                result.outcome = outcomeName;
+                result.target  = outcomes[outcomeName];
             }
+        }
+        result.actual         = event[result.outcome];
+        result.matchOutcome   = result.target === result.actual;
 
-            var constraint = true;
-            for (var condition in conditional) {
-                var criteria = conditional[condition]
-                var value = event[condition]
-                console.log('condition: ' + condition);
-                console.log('value: ' + value);
-                constraint = (criteria === value)
-                console.log('criteria === value =>' + constraint);
-            }
-
-
-            if (constraint && matchOutcome) {
-                matched += 1;
-            } else if (constraint && !matchOutcome) {
-                other   += 1;
-            }
-
-
+        var constraint = true;
+        for (var condition in conditional) {
+            var criteria = conditional[condition]
+            var value = event[condition]
+            constraint = (criteria === value)
         }
 
+        if (constraint && result.matchOutcome) {
+            matched += 1;
+        } else if (constraint && !result.matchOutcome) {
+            other   += 1;
+        }
 
-        total += 1;
-        console.log('matched: ' + matched);
-        console.log('other: '   + other);
-        console.log('total  : ' + total);
-        console.log('P(O|E) : ' + (matched / (matched + other)));
-        console.log('result: ' + JSON.stringify(result));
+        result.matched                = matched;
+        result.other                  = other;
+        result.total                  = total;
+        result.conditionalProbability = (matched / (matched + other));
+        result.msg = 'P( ' + JSON.stringify(outcomes) + ' | ' + JSON.stringify(conditional) + ' ) = ' + result.conditionalProbability;
 
         if (result === {}) {
             this.queue(event);
             return;
-        }
-
-        this.queue(event);
-/*
-        for (var outcome in result)  {
-            event[outcome];
-        event[condition.outcome]
-        for (var property in event) {
-            event[
-        }
-        var conditional = event[condition.conditional];
-        var outcome     = event[condition.outcome];
-
-        var criteria    = condition[condition.conditional];
-
-        var applicable  = (criteria === conditional);
-
-
-        if (applicable && outcome) {
-            var occurrences = conditionals[outcome];
-            if (!occurrences) conditionals[outcome] = 0;
-
-            occurrences += 1;
-
-            conditionals[outcome] = occurrences;
-            this.queue({msg: 'P( ' + outcome + ' | ' + conditional + ' )',
-                        outcome : outcome,
-                        condition : conditional})
-
         } else {
-            this.queue(event);
+            this.queue(result);
+            return;
         }
-*/
+
 
     }, function(end) {
 
