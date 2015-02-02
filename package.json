@@ -17,9 +17,11 @@
   "author": "Seth Lakowske",
   "license": "BSD-3",
   "devDependencies": {
+    "level": "^0.18.0",
     "tape": "^3.5.0"
   },
   "dependencies": {
-    "through": "^2.3.6"
+    "through": "^2.3.6",
+    "through2": "^0.6.3"
   }
 }

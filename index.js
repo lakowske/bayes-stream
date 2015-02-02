@@ -55,7 +55,7 @@ function buildBayesStream(condition) {
         result.matched                = matched;
         result.other                  = other;
         result.total                  = total;
-        result.conditionalProbability = (matched / (matched + other));
+        result.conditionalProbability = (matched / (matched + other)) || 0.0;
         result.msg = 'P( ' + JSON.stringify(outcomes) + ' | ' + JSON.stringify(conditional) + ' ) = ' + result.conditionalProbability;
 
         if (result === {}) {
