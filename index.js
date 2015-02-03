@@ -6,14 +6,19 @@
 var through = require('through');
 
 /*
- * Return the probability of event occurring given some evidence (i.e. condition).
+ * Return the probability of event occurring given some evidence.
  *
  * @param {Object} condition to stream probability for.
+ *
  * e.g. { outcome : {cancer : 'true'}, conditional : {diagnosis : "true"} }
+ *
  * @param {Object} event with properties describing the event
+ *
  * e.g. {cancer : "true", diagnosis : "true"} or
  *      { url   : "/articles/github-push-event-deployment", system : "Linux" }
+ *
  * @return {Object} Return the conditional probablity of events.
+ *
  * e.g. P( { url : '/news' } | {system : 'linux', referal : '/about' } ) = 0.1   or
  *      P( { url : '/news' } | {system : 'linux'} )                      = 0.75
  */

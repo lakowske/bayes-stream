@@ -20,6 +20,7 @@ test('predicts cancer likelihood', function(t) {
 
     var capture = through(function(data) {
         output.push(data);
+        console.log(data);
         this.queue(data);
     }, function(end) {
         t.equal(output[output.length-1].conditionalProbability, 0.75, '3/4 probability')
