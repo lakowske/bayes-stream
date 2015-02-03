@@ -1,8 +1,8 @@
 * bayes-stream
 
 Calculate conditional probability of an event, eg. {cancer : 'true'}, occurring given some
-evidence, eg. {diagnosis : "true"}.  In other words, given some evidence what is the
-probability of a specific outcome.
+evidence, eg. {diagnosis : "true"}.  In other words, given some evidence, what is the
+probability of a specific outcome?
 
 ```js
     var bayes = bayesCalc({
@@ -101,5 +101,5 @@ output
 ```
 
 The output is the conditional probability object containing statistics
-and a user message that is human readable.
+and a user message meant to be human readable.
 
